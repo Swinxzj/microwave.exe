@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
-const profiles = require('../data/profiles');
+const profileManager = require('../data/profileManager');
 
-const moods = [
+const baseMoods = [
     {
         title: 'Midnight Velvet',
         description: 'A quiet room lit by amber candles, soft piano on loop, and the smell of cinnamon simmering on the stove.',
@@ -58,19 +58,26 @@ module.exports = {
         .setName('mood')
         .setDescription('Receive a random cozy aesthetic mood in an atmospheric embed'),
     async execute(interaction) {
-        const mood = moods[Math.floor(Math.random() * moods.length)];
+        const userId = interaction.user.id;
+        const identity = profileManager.getOrCreateUser(userId);
+        profileManager.recordInteraction(userId, 'mood');
+
+        const mood = baseMoods[Math.floor(Math.random() * baseMoods.length)];
+        identity.recordMood(mood.title);
+        
         const embed = theme.createEmbed({
             title: mood.title,
             description: mood.description,
             color: mood.color,
             fields: [
-                { name: 'Weather', value: mood.weather, inline: true },
-                { name: 'Song Vibe', value: mood.song, inline: true },
-                { name: 'Emotional Status', value: mood.status, inline: true },
+                { name: 'Weather', value: identity.currentWeather, inline: true },
+                { name: 'Song Vibe', value: identity.coreSoundtrack, inline: true },
+                { name: 'Emotional Status', value: identity.getContextualStatus(), inline: true },
             ],
             footerText: 'Cozy mood delivered with gentle atmosphere',
         });
 
+        profileManager.updateUser(userId, identity);
         await interaction.reply({ embeds: [embed] });
     },
 };

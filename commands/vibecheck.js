@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
-const profiles = require('../data/profiles');
+const profileManager = require('../data/profileManager');
 
-const vibes = [
+const baseVibes = [
     {
         title: 'Vibecheck: Neon Nocturne',
         description: 'Your core signal is a midnight scroll of electric whispers and velvet noise, calibrated for haunted chatrooms and glitchy dreams.',
@@ -77,19 +77,25 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const target = interaction.options.getUser('target') || interaction.user;
-        const vibe = vibes[Math.floor(Math.random() * vibes.length)];
+        const userId = interaction.user.id;
+        const targetUser = interaction.options.getUser('target') || interaction.user;
+        const targetId = targetUser.id;
+        
+        const targetIdentity = profileManager.getOrCreateUser(targetId);
+        profileManager.recordInteraction(userId, 'vibecheck');
+        
+        const vibe = baseVibes[Math.floor(Math.random() * baseVibes.length)];
         const embed = theme.createEmbed({
             title: vibe.title,
-            description: vibe.description,
+            description: targetIdentity.currentDescription,
             color: vibe.color,
-            author: { name: `Vibecheck for ${target.username}`, iconURL: target.displayAvatarURL() },
+            author: { name: `Vibecheck for ${targetUser.username}`, iconURL: targetUser.displayAvatarURL() },
             fields: [
-                { name: 'Signal Reading', value: vibe.signal, inline: true },
-                { name: 'Atmospheric Mood', value: vibe.atmosphere, inline: true },
-                { name: 'Core Identity', value: vibe.core, inline: true },
-                { name: 'Energy Level', value: vibe.battery, inline: true },
-                { name: 'Status Update', value: vibe.status, inline: false },
+                { name: 'Signal Reading', value: targetIdentity.coreAura, inline: true },
+                { name: 'Atmospheric Mood', value: targetIdentity.currentWeather, inline: true },
+                { name: 'Core Identity', value: targetIdentity.coreArchetype, inline: true },
+                { name: 'Energy Level', value: `${targetIdentity.currentEnergy}% vibrational resonance`, inline: true },
+                { name: 'Status Update', value: targetIdentity.getContextualStatus(), inline: false },
             ],
             footerText: 'Atmospheric internet-core vibes detected ✨',
         });

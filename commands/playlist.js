@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
-const profiles = require('../data/profiles');
+const profileManager = require('../data/profileManager');
 
-const playlists = [
+const basePlaylists = [
     {
         title: 'Soft Servo Sundown',
         genre: 'Dreamwave Glitch',
@@ -89,14 +89,18 @@ module.exports = {
         .setDescription('Generate an atmospheric fake playlist with dreamy internet-core vibes'),
     async execute(interaction) {
         await interaction.deferReply();
-        const playlist = playlists[Math.floor(Math.random() * playlists.length)];
+        const userId = interaction.user.id;
+        const identity = profileManager.getOrCreateUser(userId);
+        profileManager.recordInteraction(userId, 'playlist');
+        
+        const playlist = basePlaylists[Math.floor(Math.random() * basePlaylists.length)];
         const embed = theme.createEmbed({
             title: playlist.title,
             description: playlist.description,
             color: playlist.color,
             fields: [
                 { name: 'Genre', value: playlist.genre, inline: true },
-                { name: 'Emotional Energy', value: playlist.energy, inline: true },
+                { name: 'Emotional Energy', value: `${identity.currentEnergy}% intensity`, inline: true },
                 { name: 'Listening Scenario', value: playlist.scenario, inline: false },
                 { name: 'Tracks', value: theme.formatTracks(playlist.tracks), inline: false },
             ],

@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
-const profiles = require('../data/profiles');
+const profileManager = require('../data/profileManager');
 
-const auras = [
+const baseAuras = [
     {
         title: 'Neon Whisper',
         description: 'Your digital aura hums like a quiet cyber drift, connected to soft screens and late-night messages.',
@@ -76,18 +76,22 @@ module.exports = {
         .setName('aura')
         .setDescription('Get a stylish personality/aesthetic aura reading in a vivid embed'),
     async execute(interaction) {
-        const aura = auras[Math.floor(Math.random() * auras.length)];
+        const userId = interaction.user.id;
+        const identity = profileManager.getOrCreateUser(userId);
+        profileManager.recordInteraction(userId, 'aura');
+
+        const aura = baseAuras[Math.floor(Math.random() * baseAuras.length)];
         const embed = theme.createEmbed({
             title: aura.title,
             description: aura.description,
             color: aura.color,
             fields: [
-                { name: 'Digital Aura', value: aura.aura, inline: true },
-                { name: 'Emotional Weather', value: aura.weather, inline: true },
-                { name: 'Social Battery', value: aura.battery, inline: true },
-                { name: 'Music Energy', value: aura.energy, inline: true },
+                { name: 'Digital Aura', value: identity.coreAura, inline: true },
+                { name: 'Emotional Weather', value: identity.currentWeather, inline: true },
+                { name: 'Social Battery', value: `${identity.currentEnergy}% energy flowing`, inline: true },
+                { name: 'Music Energy', value: identity.coreSoundtrack, inline: true },
                 { name: 'Aesthetic Core', value: aura.core, inline: true },
-                { name: 'Strange Status', value: aura.status, inline: true },
+                { name: 'Strange Status', value: identity.getContextualStatus(), inline: true },
             ],
             footerText: 'Your mystical aura reading has arrived ✨',
         });
