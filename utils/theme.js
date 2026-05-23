@@ -23,7 +23,9 @@ function createEmbed({ title, description, color, fields = [], author, footerTex
         .addFields(fields);
 
     if (author) embed.setAuthor(author);
-    embed.setFooter({ text: footerText || footer.text, iconURL: footer.iconURL });
+    const footerData = { text: footerText || footer.text };
+    if (footer.iconURL) footerData.iconURL = footer.iconURL;
+    embed.setFooter(footerData);
     if (timestamp) embed.setTimestamp(new Date());
 
     return embed;

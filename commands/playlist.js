@@ -87,6 +87,7 @@ module.exports = {
         .setName('playlist')
         .setDescription('Generate an atmospheric fake playlist with dreamy internet-core vibes'),
     async execute(interaction) {
+        await interaction.deferReply();
         const playlist = playlists[Math.floor(Math.random() * playlists.length)];
         const embed = theme.createEmbed({
             title: playlist.title,
@@ -101,6 +102,6 @@ module.exports = {
             footerText: 'Curated for cozy late-night internet-core dreams',
         });
 
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
     },
 };

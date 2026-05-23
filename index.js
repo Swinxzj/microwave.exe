@@ -14,6 +14,22 @@ if (!token || !clientId) {
     process.exit(1);
 }
 
+// Filter the specific discord.js deprecation warning about 'ready' -> 'clientReady'
+const _origEmitWarning = process.emitWarning;
+process.emitWarning = function (warning, ...args) {
+    try {
+        // warning can be a string or Error-like object
+        if (typeof warning === 'string') {
+            if (/ready event has been renamed to clientReady/.test(warning)) return;
+        } else if (warning && warning.name === 'DeprecationWarning' && /ready event has been renamed to clientReady/.test(warning.message)) {
+            return;
+        }
+    } catch (e) {
+        // fall back to normal behavior
+    }
+    return _origEmitWarning.call(process, warning, ...args);
+};
+
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.commands = new Collection();
 
@@ -35,7 +51,12 @@ for (const file of commandFiles) {
     }
 }
 
-client.once('ready', async () => {
+let _commandsRegistered = false;
+
+async function registerCommands() {
+    if (_commandsRegistered) return;
+    _commandsRegistered = true;
+
     console.log(`Bot is online! Registering ${commands.length} command(s) ${guildId ? `to guild ${guildId}` : 'globally'}.`);
 
     const rest = new REST({ version: '10' }).setToken(token);
@@ -53,7 +74,11 @@ client.once('ready', async () => {
     } catch (error) {
         console.error(error);
     }
-});
+}
+
+// Use the new `clientReady` event if available, but keep a `ready` fallback
+client.once('clientReady', registerCommands);
+client.once('ready', registerCommands);
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
@@ -65,10 +90,14 @@ client.on('interactionCreate', async interaction => {
         await command.execute(interaction);
     } catch (error) {
         console.error(`Error executing ${interaction.commandName}:`, error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command.', ephemeral: true });
-        } else {
-            await interaction.reply({ content: 'There was an error while executing this command.', ephemeral: true });
+        try {
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({ content: 'There was an error while executing this command.', flags: 64 });
+            } else {
+                await interaction.reply({ content: 'There was an error while executing this command.', flags: 64 });
+            }
+        } catch (replyError) {
+            console.error('Failed to send error response for the failed interaction:', replyError);
         }
     }
 });
