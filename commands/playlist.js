@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
+const theme = require('../utils/theme');
 
 const playlists = [
     {
@@ -87,18 +88,18 @@ module.exports = {
         .setDescription('Generate an atmospheric fake playlist with dreamy internet-core vibes'),
     async execute(interaction) {
         const playlist = playlists[Math.floor(Math.random() * playlists.length)];
-        const embed = new EmbedBuilder()
-            .setTitle(playlist.title)
-            .setDescription(playlist.description)
-            .setColor(playlist.color)
-            .addFields(
+        const embed = theme.createEmbed({
+            title: playlist.title,
+            description: playlist.description,
+            color: playlist.color,
+            fields: [
                 { name: 'Genre', value: playlist.genre, inline: true },
                 { name: 'Emotional Energy', value: playlist.energy, inline: true },
                 { name: 'Listening Scenario', value: playlist.scenario, inline: false },
-                { name: 'Tracks', value: playlist.tracks.map((t, index) => `${index + 1}. ${t}`).join('\n'), inline: false },
-            )
-            .setFooter({ text: 'Curated for cozy late-night internet-core dreams' })
-            .setTimestamp(new Date());
+                { name: 'Tracks', value: theme.formatTracks(playlist.tracks), inline: false },
+            ],
+            footerText: 'Curated for cozy late-night internet-core dreams',
+        });
 
         await interaction.reply({ embeds: [embed] });
     },

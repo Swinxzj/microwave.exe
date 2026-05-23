@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
+const theme = require('../utils/theme');
 
 const vibes = [
     {
@@ -77,20 +78,20 @@ module.exports = {
     async execute(interaction) {
         const target = interaction.options.getUser('target') || interaction.user;
         const vibe = vibes[Math.floor(Math.random() * vibes.length)];
-        const embed = new EmbedBuilder()
-            .setTitle(vibe.title)
-            .setDescription(vibe.description)
-            .setColor(vibe.color)
-            .setAuthor({ name: `Vibecheck for ${target.username}`, iconURL: target.displayAvatarURL() })
-            .addFields(
+        const embed = theme.createEmbed({
+            title: vibe.title,
+            description: vibe.description,
+            color: vibe.color,
+            author: { name: `Vibecheck for ${target.username}`, iconURL: target.displayAvatarURL() },
+            fields: [
                 { name: 'Signal Reading', value: vibe.signal, inline: true },
                 { name: 'Atmospheric Mood', value: vibe.atmosphere, inline: true },
                 { name: 'Core Identity', value: vibe.core, inline: true },
                 { name: 'Energy Level', value: vibe.battery, inline: true },
                 { name: 'Status Update', value: vibe.status, inline: false },
-            )
-            .setFooter({ text: 'Atmospheric internet-core vibes detected ✨' })
-            .setTimestamp(new Date());
+            ],
+            footerText: 'Atmospheric internet-core vibes detected ✨',
+        });
 
         await interaction.reply({ embeds: [embed] });
     },

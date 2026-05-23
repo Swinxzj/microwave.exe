@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
+const theme = require('../utils/theme');
 
 const auras = [
     {
@@ -75,20 +76,20 @@ module.exports = {
         .setDescription('Get a stylish personality/aesthetic aura reading in a vivid embed'),
     async execute(interaction) {
         const aura = auras[Math.floor(Math.random() * auras.length)];
-        const embed = new EmbedBuilder()
-            .setTitle(aura.title)
-            .setDescription(aura.description)
-            .setColor(aura.color)
-            .addFields(
+        const embed = theme.createEmbed({
+            title: aura.title,
+            description: aura.description,
+            color: aura.color,
+            fields: [
                 { name: 'Digital Aura', value: aura.aura, inline: true },
                 { name: 'Emotional Weather', value: aura.weather, inline: true },
                 { name: 'Social Battery', value: aura.battery, inline: true },
                 { name: 'Music Energy', value: aura.energy, inline: true },
                 { name: 'Aesthetic Core', value: aura.core, inline: true },
                 { name: 'Strange Status', value: aura.status, inline: true },
-            )
-            .setFooter({ text: 'Your mystical aura reading has arrived ✨' })
-            .setTimestamp(new Date());
+            ],
+            footerText: 'Your mystical aura reading has arrived ✨',
+        });
 
         await interaction.reply({ embeds: [embed] });
     },

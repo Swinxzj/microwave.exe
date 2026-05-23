@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
+const theme = require('../utils/theme');
 
 const moods = [
     {
@@ -57,17 +58,17 @@ module.exports = {
         .setDescription('Receive a random cozy aesthetic mood in an atmospheric embed'),
     async execute(interaction) {
         const mood = moods[Math.floor(Math.random() * moods.length)];
-        const embed = new EmbedBuilder()
-            .setTitle(mood.title)
-            .setDescription(mood.description)
-            .setColor(mood.color)
-            .addFields(
+        const embed = theme.createEmbed({
+            title: mood.title,
+            description: mood.description,
+            color: mood.color,
+            fields: [
                 { name: 'Weather', value: mood.weather, inline: true },
                 { name: 'Song Vibe', value: mood.song, inline: true },
                 { name: 'Emotional Status', value: mood.status, inline: true },
-            )
-            .setFooter({ text: 'Cozy mood delivered with gentle atmosphere' })
-            .setTimestamp(new Date());
+            ],
+            footerText: 'Cozy mood delivered with gentle atmosphere',
+        });
 
         await interaction.reply({ embeds: [embed] });
     },
