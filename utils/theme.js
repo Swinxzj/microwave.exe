@@ -15,16 +15,25 @@ const footer = {
     iconURL: null,
 };
 
-function createEmbed({ title, description, color, fields = [], author, footerText, timestamp = true }) {
+function createEmbed({ title, description, color, fields = [], author, footerText, variant, timestamp = true }) {
     const embed = new EmbedBuilder()
-        .setTitle(title)
+        .setTitle(variant?.emoji ? `${variant.emoji} ${title}` : title)
         .setDescription(description)
-        .setColor(color || colors.pastel)
-        .addFields(fields);
+        .setColor(color || colors.pastel);
+
+    const enrichedFields = [];
+    if (variant?.rarity) {
+        enrichedFields.push({ name: 'Rarity', value: `*${variant.rarity} Variant*`, inline: true });
+    }
+    embed.addFields([...enrichedFields, ...fields]);
 
     if (author) embed.setAuthor(author);
-    const footerData = { text: footerText || footer.text };
-    if (footer.iconURL) footerData.iconURL = footer.iconURL;
+    const footerData = { text: variant?.footerText || footerText || footer.text };
+    if (variant?.footerIconURL) {
+        footerData.iconURL = variant.footerIconURL;
+    } else if (footer.iconURL) {
+        footerData.iconURL = footer.iconURL;
+    }
     embed.setFooter(footerData);
     if (timestamp) embed.setTimestamp(new Date());
 

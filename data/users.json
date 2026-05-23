@@ -1,0 +1,38 @@
+{
+  "1256687364206760056": {
+    "userId": "1256687364206760056",
+    "createdAt": "2026-05-23T07:21:44.226Z",
+    "lastUpdated": "2026-05-23T07:33:29.899Z",
+    "coreAura": "Silvery moon sheen",
+    "coreArchetype": "Aesthetic Signal Shifter",
+    "coreSoundtrack": "cassette daydream lullabies",
+    "aestheticTags": [
+      "clean",
+      "stylish",
+      "pastel noir",
+      "emotionally weird"
+    ],
+    "currentWeather": "Cloudy pixel twilight with distant synth rain",
+    "currentDescription": "A serene profile built around gentle emotional clarity and dreamy online presence.",
+    "recentStatuses": [],
+    "baselineEnergy": 40,
+    "currentEnergy": 51,
+    "commandsUsed": {
+      "profile": 20,
+      "mood": 9,
+      "aura": 4
+    },
+    "totalInteractions": 33,
+    "favoriteCommands": [
+      "profile",
+      "mood",
+      "aura"
+    ],
+    "moodHistory": [
+      "Midnight Velvet",
+      "Sunrise Hearth",
+      "Candlelit Comfort",
+      "Moonlit Cozy"
+    ]
+  }
+}

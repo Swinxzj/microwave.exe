@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
 const profileManager = require('../data/profileManager');
+const profiles = require('../data/profiles');
 
 const baseVibes = [
     {
@@ -84,11 +85,13 @@ module.exports = {
         const targetIdentity = profileManager.getOrCreateUser(targetId);
         profileManager.recordInteraction(userId, 'vibecheck');
         
-        const vibe = baseVibes[Math.floor(Math.random() * baseVibes.length)];
+        const variantPick = profiles.pickVariant('vibe');
+        const vibe = variantPick && variantPick.variant ? variantPick.variant : baseVibes[Math.floor(Math.random() * baseVibes.length)];
         const embed = theme.createEmbed({
             title: vibe.title,
             description: targetIdentity.currentDescription,
             color: vibe.color,
+            variant: variantPick && variantPick.variant ? variantPick.variant : null,
             author: { name: `Vibecheck for ${targetUser.username}`, iconURL: targetUser.displayAvatarURL() },
             fields: [
                 { name: 'Signal Reading', value: targetIdentity.coreAura, inline: true },

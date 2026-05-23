@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
 const profileManager = require('../data/profileManager');
+const profiles = require('../data/profiles');
 
 const baseMoods = [
     {
@@ -62,13 +63,15 @@ module.exports = {
         const identity = profileManager.getOrCreateUser(userId);
         profileManager.recordInteraction(userId, 'mood');
 
-        const mood = baseMoods[Math.floor(Math.random() * baseMoods.length)];
+        const variantPick = profiles.pickVariant('mood');
+        const mood = variantPick && variantPick.variant ? variantPick.variant : baseMoods[Math.floor(Math.random() * baseMoods.length)];
         identity.recordMood(mood.title);
         
         const embed = theme.createEmbed({
             title: mood.title,
             description: mood.description,
             color: mood.color,
+            variant: variantPick && variantPick.variant ? variantPick.variant : null,
             fields: [
                 { name: 'Weather', value: identity.currentWeather, inline: true },
                 { name: 'Song Vibe', value: identity.coreSoundtrack, inline: true },

@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
 const profileManager = require('../data/profileManager');
+const profiles = require('../data/profiles');
 
 const baseAuras = [
     {
@@ -80,11 +81,13 @@ module.exports = {
         const identity = profileManager.getOrCreateUser(userId);
         profileManager.recordInteraction(userId, 'aura');
 
-        const aura = baseAuras[Math.floor(Math.random() * baseAuras.length)];
+        const variantPick = profiles.pickVariant('aura');
+        const aura = variantPick && variantPick.variant ? variantPick.variant : baseAuras[Math.floor(Math.random() * baseAuras.length)];
         const embed = theme.createEmbed({
             title: aura.title,
             description: aura.description,
             color: aura.color,
+            variant: variantPick && variantPick.variant ? variantPick.variant : null,
             fields: [
                 { name: 'Digital Aura', value: identity.coreAura, inline: true },
                 { name: 'Emotional Weather', value: identity.currentWeather, inline: true },

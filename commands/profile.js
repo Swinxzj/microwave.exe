@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
 const profiles = require('../data/profiles');
+const profileManager = require('../data/profileManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,13 +13,15 @@ module.exports = {
         const identity = profileManager.getOrCreateUser(userId);
         profileManager.recordInteraction(userId, 'profile');
         
+        const variantPick = profiles.pickVariant('profile');
         const profileColors = [theme.colors.neon, theme.colors.amber, theme.colors.cyan, theme.colors.velvet, theme.colors.moon];
-        const color = profileColors[Math.floor(Math.random() * profileColors.length)];
+        const color = variantPick && variantPick.variant && variantPick.variant.color ? variantPick.variant.color : profileColors[Math.floor(Math.random() * profileColors.length)];
 
         const embed = theme.createEmbed({
-            title: `${interaction.user.username}'s Identity Profile`,
-            description: identity.currentDescription,
+            title: variantPick && variantPick.variant && variantPick.variant.title ? variantPick.variant.title : `${interaction.user.username}'s Identity Profile`,
+            description: variantPick && variantPick.variant && variantPick.variant.description ? variantPick.variant.description : identity.currentDescription,
             color: color,
+            variant: variantPick && variantPick.variant ? variantPick.variant : null,
             fields: [
                 { name: 'Aura Type', value: identity.coreAura, inline: true },
                 { name: 'Emotional Weather', value: identity.currentWeather, inline: true },

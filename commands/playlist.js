@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
 const profileManager = require('../data/profileManager');
+const profiles = require('../data/profiles');
 
 const basePlaylists = [
     {
@@ -93,11 +94,13 @@ module.exports = {
         const identity = profileManager.getOrCreateUser(userId);
         profileManager.recordInteraction(userId, 'playlist');
         
-        const playlist = basePlaylists[Math.floor(Math.random() * basePlaylists.length)];
+        const variantPick = profiles.pickVariant('playlist');
+        const playlist = variantPick && variantPick.variant ? variantPick.variant : basePlaylists[Math.floor(Math.random() * basePlaylists.length)];
         const embed = theme.createEmbed({
             title: playlist.title,
             description: playlist.description,
             color: playlist.color,
+            variant: variantPick && variantPick.variant ? variantPick.variant : null,
             fields: [
                 { name: 'Genre', value: playlist.genre, inline: true },
                 { name: 'Emotional Energy', value: `${identity.currentEnergy}% intensity`, inline: true },
