@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const theme = require('../utils/theme');
+const profiles = require('../data/profiles');
 
 const vibes = [
     {
